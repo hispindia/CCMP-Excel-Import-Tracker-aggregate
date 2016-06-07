@@ -1,0 +1,278 @@
+#set($xmlString = $XMLcontent)
+
+<script>
+    $(document).ready(function(){
+
+         if( typeof window.DOMParser === "undefined" ){
+            window.DOMParser = function(){};
+
+            window.DOMParser.prototype.parseFromString = function(str, contentType){
+                if(typeof ActiveXObject !== 'undefined'){
+                    var xmldata = new ActiveXObject('MSXML.DomDocument');
+                    xmldata.async = false;
+                    xmldata.loadXML(str);
+                    return xmldata;
+                } else
+                if(typeof XMLHttpRequest !== 'undefined'){
+                    var xmldata = new XMLHttpRequest;
+
+                    if(!contentType){
+                        contentType = 'application/xml';
+                    }
+
+                    xmldata.open('GET', 'data:' + contentType + ';charset=utf-8,' + encodeURIComponent(str), false);
+
+                    if(xmldata.overrideMimeType) {
+                        xmldata.overrideMimeType(contentType);
+                    }
+
+                    xmldata.send(null);
+                    return xmldata.responseXML;
+                }
+            };
+        }
+    });
+
+	//alert( "inside import.vm 1 " + $keyCodeList );
+	//alert( "inside import.vm 2 " + $uidMap );
+	//alert( "inside import.vm 3 " + $xmlString );
+	
+	
+	
+    var orgUnitUidMap = new Object();
+
+        #foreach( $key in $keyCodeList )
+        orgUnitUidMap["$key"] = '$uidMap.get("$key")';
+        //console.log('$key' +':'+'$uidMap.get("$key")');
+        #end
+
+    var parser = new DOMParser();
+    var xmlObject = parser.parseFromString('${xmlString}', "text/xml");
+
+    var trackedEntity = $(xmlObject).find("de-codes").find("meta").find("trackedEntity").text(),
+        orgunit_col = $(xmlObject).find("de-codes").find("registration").find("orgunit").attr('col'),
+        uniqueKey = $(xmlObject).find("de-codes").find("meta").find("uniquekey").text();
+
+    //registration JSON object creation to send to api
+    /*--------------------------------------------------------------------------------------------*/
+    var registrationJSON = {
+        "trackedEntity": trackedEntity.toString(),
+    };
+    var registerAttributeMap = new Object();
+
+    $( xmlObject ).find("de-codes").find("registration").find("attribute").each(function(){
+        var  attributeUId = $(this).text(),
+             colno =  $(this).attr('col');
+             registerAttributeMap[attributeUId] = colno;
+    });
+    /*--------------------------------------------------------------------------------------------*/
+
+
+    //enrollment JSON object creation to send to api
+    /*-------------------------------------------------------------------------------------------*/
+
+    var enrollmentDate_col = $( xmlObject ).find("de-codes").find("enrollment").find("date").attr("col");
+    var program = $( xmlObject ).find("de-codes").find("enrollment").find("program").text();
+
+    var enrollmentJSON = {
+        "program": program
+    }
+    /*---------------------------------------------------------------------------------------------*/
+
+
+    //event JSON object creation to send to api
+    /*-------------------------------------------------------------------------------------------*/
+
+    var programStage = $( xmlObject ).find("de-codes").find("event").find("programStage").text();
+    var status = $( xmlObject ).find("de-codes").find("event").find("status").text();
+	var eventDate_col = $( xmlObject ).find("de-codes").find("event").find("date").attr("col");
+	
+	
+	
+    var datavalueMap = new Object();
+	
+	var eventJSON = {};
+	
+	if( programStage != undefined && ( programStage != "" || programStage != '') )
+	{
+		eventJSON = {
+        "program": program,
+        "status": "COMPLETED",
+        "programStage": programStage
+		};
+
+	}
+    
+    $( xmlObject ).find("de-codes").find("event").find("dataValues").find("de-code").each(function(){
+        var  dataElementUId = $(this).text();
+		//console.log("dataElementUId -- " + dataElementUId);
+		if( dataElementUId != undefined && ( dataElementUId != "" || dataElementUId != '') )
+		{
+			colno =  $(this).attr('col');
+			datavalueMap[dataElementUId] = colno ;
+		}
+    });
+    /*---------------------------------------------------------------------------------------------*/
+	
+	var today = new Date();
+	var dd = today.getDate();
+	var mm = today.getMonth()+1; //January is 0!
+	var yyyy = today.getFullYear();
+
+	if(dd<10) 
+	{
+		dd='0'+dd
+	} 
+
+	if(mm<10) 
+	{
+		mm='0'+mm
+	} 
+
+	//today = mm+'/'+dd+'/'+yyyy;
+	today = yyyy+'-'+mm+'-'+dd;
+	
+	console.log(today);
+	
+    for(var row = 5; row < lastRowNo ; row++)
+    {
+		//alert( "inside import.vm 4 " + row + " -- " + orgunit_col );
+		
+		var orgUnitUid ='';
+        var orgUnitUid = ExcelCellMap[row+'_'+orgunit_col];
+        
+		//alert( "inside import.vm 5 " + orgUnitCode );
+		
+        if( orgUnitUid != undefined)
+        {
+            var programEnrollmentDate = ExcelCellMap[row+'_'+enrollmentDate_col];
+
+          //var programStageInstanceDate = ExcelCellMap[row+'_'+eventDate_col];
+			
+			
+			var uniquKeyValue = new String();
+
+            var attributes=[];
+            var datavalues = [];
+
+            for(var attributeUid in registerAttributeMap)
+            {
+                var item = {};
+                item ["attribute"] = attributeUid;
+
+                if(ExcelCellMap[row+'_'+registerAttributeMap[attributeUid]] != undefined)
+                {
+
+                    item ["value"] = ExcelCellMap[row+'_'+registerAttributeMap[attributeUid]];
+                    switch (registerAttributeMap[attributeUid])
+                    {
+                        case '5' : uniquKeyValue += ExcelCellMap[row+'_'+registerAttributeMap[attributeUid]]
+                          break;
+                        case '6' : uniquKeyValue += '_'+ ExcelCellMap[row+'_'+registerAttributeMap[attributeUid]]
+                          break;
+                        case '10' : uniquKeyValue += '_'+ ExcelCellMap[row+'_'+registerAttributeMap[attributeUid]]
+                          break;
+                      }
+
+                    /*
+                    switch (registerAttributeMap[attributeUid])
+                    {
+                        case '4' : uniquKeyValue += ExcelCellMap[row+'_'+registerAttributeMap[attributeUid]]
+                            break;
+                        case '5' : uniquKeyValue += '_'+ ExcelCellMap[row+'_'+registerAttributeMap[attributeUid]]
+                            break;
+                        case '9' : uniquKeyValue += '_'+ ExcelCellMap[row+'_'+registerAttributeMap[attributeUid]]
+                            break;
+                        case '10' : uniquKeyValue += '_'+ ExcelCellMap[row+'_'+registerAttributeMap[attributeUid]]
+                            break;
+                    }
+					*/
+                }
+                else
+                {
+                    item ["value"]="";
+                    //console.log('There is missing value for attribute id in row number '+attributeUid+' '+(row + 1 ));
+                }
+
+                attributes.push(item);
+            }
+			
+
+            var unique = {};
+
+            unique["attribute"] = uniqueKey;
+            unique["value"] = uniquKeyValue ;
+
+            attributes.push(unique);
+
+			
+			
+			for(var dataelement in datavalueMap)
+			{
+				var dataelements = {};
+				dataelements ["dataElement"] = dataelement;
+
+				if( ExcelCellMap[row+'_'+datavalueMap[dataelement]] != undefined ){
+					dataelements ["value"] = ExcelCellMap[row+'_'+datavalueMap[dataelement]];
+				}else
+				{
+					dataelements ["value"] = "";
+				}
+				datavalues.push(dataelements);
+			}
+			
+			
+			
+			/*
+			if( datavalueMap.length > 0 )
+			{
+				for(var dataelement in datavalueMap)
+				{
+					var dataelements = {};
+					dataelements ["dataElement"] = dataelement;
+
+					if( ExcelCellMap[row+'_'+datavalueMap[dataelement]] != undefined ){
+						dataelements ["value"] = ExcelCellMap[row+'_'+datavalueMap[dataelement]];
+					}else
+					{
+						dataelements ["value"] = "";
+					}
+					datavalues.push(dataelements);
+				}
+			
+			}
+			*/
+			
+			// registration related and
+            //orgUnitUid =  orgUnitUidMap[orgUnitCode.toString().trim()];
+			orgUnitUid =  orgUnitUid.toString().trim();
+            registrationJSON.orgUnit = orgUnitUid ;
+            registrationJSON.attributes = attributes;
+			// registration date
+			registrationJSON.created = programEnrollmentDate;
+			
+			
+			// program enrolment related
+            //enrollmentJSON.dateOfEnrollment = enrollmentDate;
+			enrollmentJSON.orgUnit = orgUnitUid;
+			enrollmentJSON.enrollmentDate = programEnrollmentDate;
+			enrollmentJSON.incidentDate = programEnrollmentDate;
+			
+			// events related
+			eventJSON.orgUnit = orgUnitUid;
+            eventJSON.eventDate = programEnrollmentDate;
+			//eventJSON.eventDate = today;
+			//eventJSON.eventDate = programStageInstanceDate;
+            eventJSON.dataValues = datavalues;
+			
+			//console.log(eventJSON.dataValues.length);
+			console.log(row);
+			
+            importExcelData(registrationJSON, enrollmentJSON, eventJSON,row);
+       }
+
+     /*     console.log(JSON.stringify(registrationJSON));
+          console.log(JSON.stringify(enrollmentJSON));
+          console.log((JSON.stringify(eventJSON))) ;*/
+    }
+</script>

@@ -1,0 +1,130 @@
+<form name="dataEntryOuterForm" novalidate>                
+    <table class="table-borderless table-striped" ng-if='currentEvent'>
+        <thead>
+            <tr class="col-md-12">
+                <th class="col-md-5">
+                    {{'data_element'| translate}}
+                </th>
+                <th class="col-md-5 align-center">
+                    {{'value'| translate}}
+                </th>
+                <th class="col-md-2 align-center" ng-if="allowProvidedElsewhereExists">
+                    {{'provided_elsewhere'| translate}}
+                </th>
+            </tr>
+        </thead>
+        <tr class="col-md-12" ng-repeat="prStDe in currentStage.programStageDataElements">
+            <td class="col-md-5">
+                {{prStDe.dataElement.formName ? prStDe.dataElement.formName : prStDe.dataElement.name}}
+            </td>
+            <td class="col-md-5">
+                <ng-form name="dataEntryInnerForm">
+                    <div ng-switch="prStDe.dataElement.type">
+                        <div ng-switch-when="int">
+                            <input type="number"
+                                   ng-class='getInputNotifcationClass(prStDe.dataElement.id,false)'
+                                   ng-model="currentEvent[prStDe.dataElement.id]" 
+                                   ng-required={{prStDe.compulsory}}
+                                   ng-blur="saveDatavalue(prStDe)" 
+                                   name="foo"/>
+                            <span ng-show="dataEntryOuterForm.submitted && dataEntryInnerForm.foo.$invalid" class="error">{{'number_required'| translate}}</span>
+                        </div>                        
+                        <div ng-switch-when="string">                            
+                            <div ng-if="prStDe.dataElement.optionSet">
+                                <div ng-if="!selectedProgram.dataEntryMethod || optionSets.optionSets[prStDe.dataElement.optionSet.id].options.length >= 7">
+                                    <input type="text"
+                                        ng-class='getInputNotifcationClass(prStDe.dataElement.id,false)'
+                                        ng-model="currentEvent[prStDe.dataElement.id]" 
+                                        ng-required={{prStDe.compulsory}} 
+                                        typeahead="option.name as option.name for option in optionSets.optionSets[prStDe.dataElement.optionSet.id].options | filter:$viewValue | limitTo:20" 
+                                        typeahead-open-on-focus 
+                                        typeahead-editable="false"
+                                        ng-blur="saveDatavalue(prStDe)" 
+                                        name="foo"/>
+                                    <span ng-show="dataEntryOuterForm.submitted && dataEntryInnerForm.foo.$invalid || !currentEvent[prStDe.dataElement.id] && currentElement.id === prStDe.dataElement.id" class="error">{{'invalid'| translate}}</span>
+                                </div>
+                                <div ng-if="selectedProgram.dataEntryMethod && optionSets.optionSets[prStDe.dataElement.optionSet.id].options.length < 7">
+                                    <label>                                        
+                                        <input type="radio"
+                                            ng-class='getInputNotifcationClass(prStDe.dataElement.id,true)'
+                                            name={{currentEvent[prStDe.dataElement.id]}}
+                                            ng-required={{prStDe.compulsory}} 
+                                            ng-model="currentEvent[prStDe.dataElement.id]"
+                                            ng-change="saveDatavalue(prStDe)" 
+                                            value=""> {{'no_value' | translate}}<br>                                       
+                                    </label><br>
+                                    <span ng-repeat="option in optionSets.optionSets[prStDe.dataElement.optionSet.id].options">
+                                        <label>
+                                            <input type="radio"
+                                                ng-class='getInputNotifcationClass(prStDe.dataElement.id,true)'
+                                                name={{currentEvent[prStDe.dataElement.id]}}
+                                                ng-required={{prStDe.compulsory}} 
+                                                ng-model="currentEvent[prStDe.dataElement.id]"
+                                                ng-change="saveDatavalue(prStDe)"
+                                                value={{option.name}}> {{option.name}}
+                                        </label><br>
+                                    </span>
+                                </div>                                    
+                            </div>
+                            <div ng-if="!prStDe.dataElement.optionSet">
+                                <input type="text"
+                                    ng-class='getInputNotifcationClass(prStDe.dataElement.id,false)'
+                                    ng-model="currentEvent[prStDe.dataElement.id]" 
+                                    ng-required={{prStDe.compulsory}}
+                                    ng-blur="saveDatavalue(prStDe)" 
+                                    name="foo"/>
+                            </div>
+                        </div>
+                        <div ng-switch-when="bool">
+                           <select ng-class='getInputNotifcationClass(prStDe.dataElement.id,false)'
+                                    ng-model="currentEvent[prStDe.dataElement.id]"
+                                    ng-required={{prStDe.compulsory}}
+                                    ng-change="saveDatavalue(prStDe)"
+                                    name="foo">
+                                <option value="">{{'please_select'| translate}}</option>
+                                <option value="false">{{'no'| translate}}</option>
+                                <option value="true">{{'yes'| translate}}</option>
+                            </select>
+
+                         <!--   <input type="checkbox"
+                                   ng-class='getInputNotifcationClass(prStDe.dataElement.id,false)'
+                                   ng-model="currentEvent[prStDe.dataElement.id]"
+                                   ng-checked="currentEvent[prStDe.dataElement.id] == 'Yes' "
+                                   ng-required={{prStDe.compulsory}}
+                                   ng-change="saveDatavalue(prStDe)"
+                                   name="foo"/>-->
+                        </div>
+                        <div ng-switch-when="date">
+                            <input type="text" 
+                                   placeholder="{{dhis2CalendarFormat.keyDateFormat}}" 
+                                   d2-date
+                                   max-date="prStDe.allowFutureDate ? '' : 0"
+                                   ng-class='getInputNotifcationClass(prStDe.dataElement.id,false)'
+                                   ng-model="currentEvent[prStDe.dataElement.id]"
+                                   ng-required={{prStDe.compulsory}}  
+                                   blur-or-change="saveDatavalue(prStDe)"
+                                   name="foo"/>
+                        </div>
+                        <div ng-switch-when="trueOnly">
+                            <input type="checkbox"
+                                   ng-class='getInputNotifcationClass(prStDe.dataElement.id,false)'
+                                   ng-model="currentEvent[prStDe.dataElement.id]"
+                                   ng-checked="currentEvent[prStDe.dataElement.id] == 'Yes' "
+                                   ng-required={{prStDe.compulsory}}
+                                   ng-change="saveDatavalue(prStDe)"
+                                   name="foo"/>
+                        </div>
+                    </div>
+                </ng-form>
+                <span ng-show="dataEntryOuterForm.submitted && dataEntryInnerForm.foo.$invalid" class="error">{{'required'| translate}}</span>
+            </td>
+            <td class="col-md-2" ng-if="allowProvidedElsewhereExists">                
+                <div class="align-center" ng-show="prStDe.allowProvidedElsewhere">
+                    <input type="checkbox" 
+                           ng-model="currentEvent.providedElsewhere[prStDe.dataElement.id]"
+                           ng-change="saveDatavalueLocation(prStDe)"/>                
+                </div>
+            </td>
+        </tr>
+    </table>
+</form>

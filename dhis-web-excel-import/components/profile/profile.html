@@ -1,0 +1,125 @@
+<div class="panel panel-info" ng-controller="ProfileController">
+    <div class="panel-heading handle bold">
+
+        <a href ng-click="enableEdit()"><span ng-class="{'light-blue': editProfile}">{{profileWidget.title| translate}}</span></a>
+        <span class="nav-pills">
+            | <a href ng-click="enableEdit()" title="{{'edit_profile'| translate}}"><span ng-class="{'light-blue': !editProfile}">{{'edit'| translate}}</span></a>
+        </span>
+        
+        <span class="pull-right">
+            <a class="small-horizonal-spacing" href ng-click="expandCollapse(profileWidget)">
+                <span ng-show="profileWidget.expand"><i class="fa fa-chevron-up" title="{{'collapse'| translate}}"></i></span>
+                <span ng-show="!profileWidget.expand"><i class="fa fa-chevron-down" title="{{'expand'| translate}}"></i></span>
+            </a>
+            <a class="small-horizonal-spacing" href ng-click="removeWidget(profileWidget)" title="{{'remove'| translate}}"><i class="fa fa-times-circle"></i></a>            
+        </span>
+    </div>
+    <div ng-show="profileWidget.expand" class="panel-body dashboard-widget-container">
+        <form name="outerForm" novalidate>
+
+            <table class="table-borderless table-striped">
+                <tr ng-repeat="attribute in selectedTei.attributes" ng-show="attribute.show">
+                    <td>
+                        <div ng-switch="attribute.displayName">
+                          <span ng-switch-when="uniqueKey">
+                          </span>
+                             <span ng-switch-default>
+                              {{attribute.displayName}}
+                             </span>
+                        </div>
+                    </td>
+                    <td>
+                        <ng-form name="innerForm">
+                            <span ng-switch="attribute.type">
+                                <span ng-switch-when="date">
+                                    <input type="text"
+                                           placeholder="{{dhis2CalendarFormat.keyDateFormat}}"
+                                           name="foo"
+                                           class="form-control"
+                                           d2-date
+                                           max-date="attribute.allowFutureDate ? '' : 0"
+                                           ng-model="attribute.value"
+                                           ng-disabled="!editProfile"
+                                           ng-required="attribute.mandatory"/>
+                                </span>
+                                <span ng-switch-when="trueOnly">
+                                    <input type="checkbox"
+                                           name="foo"
+                                           class="form-control"
+                                           ng-model="attribute.value"
+                                           ng-disabled="!editProfile"
+                                           ng-required="attribute.mandatory"/>
+                                </span>
+                                <span ng-switch-when="bool">
+                                    <select name="foo"
+                                            ng-model="attribute.value"
+                                            class="form-control"
+                                            ng-disabled="!editProfile"
+                                            ng-required="attribute.mandatory">
+                                        <option value="">{{'please_select'| translate}}</option>
+                                        <option value="false">{{'no'| translate}}</option>
+                                        <option value="true">{{'yes'| translate}}</option>
+                                    </select>
+                                </span>
+                                <span ng-switch-when="optionSet">
+                                    <input type="text"
+                                           name="foo"
+                                           class="form-control"
+                                           ng-model="attribute.value"
+                                           typeahead="option.name as option.name for option in optionSets.optionSets[attributes[attribute.attribute].optionSet.id].options | filter:$viewValue | limitTo:20"
+                                           typeahead-open-on-focus
+                                           ng-disabled="!editProfile" ng-required="attribute.mandatory"/>
+                                </span>
+                                <span ng-switch-when="number">
+                                    <input type="number"
+                                           name="foo"
+                                           class="form-control"
+                                           ng-model="attribute.value"
+                                           ng-disabled="!editProfile"
+                                           ng-required="attribute.mandatory"/>
+                                </span>
+                                <span ng-switch-when="email">
+                                    <input type="email"
+                                           name="foo"
+                                           class="form-control"
+                                           ng-model="attribute.value"
+                                           ng-disabled="!editProfile"
+                                           ng-required="attribute.mandatory"/>
+                                </span>
+                                <span ng-switch-default>
+                                    <span ng-switch="attribute.displayName">
+                                        <span ng-switch-when="uniqueKey">
+                                        </span>
+                                        <span ng-switch-default>
+                                              <input type="text"
+                                                     name="foo"
+                                                     class="form-control"
+                                                     ng-model="attribute.value"
+                                                     ng-disabled="!editProfile"
+                                                     ng-required="attribute.mandatory"/>
+                                        </span>
+                                   </span>
+                                </span>
+                            </span>
+                        </ng-form>
+                        <span ng-show="outerForm.submitted && innerForm.foo.$invalid" class="error">{{'required'| translate}}</span>
+                    </td>
+                </tr>
+            </table>
+
+            <div ng-if="editProfile" class="vertical-spacing">
+                <button type="button"
+                        class="btn btn-primary small-horizonal-spacing"
+                        ng-click="save()">
+                    {{'save'| translate}}
+                </button>
+                <button type="button"
+                        class="btn btn-default small-horizonal-spacing"
+                        ng-click="cancel()">
+                    {{'cancel'| translate}}
+                </button>
+            </div>
+
+        </form>
+    </div>
+</div>

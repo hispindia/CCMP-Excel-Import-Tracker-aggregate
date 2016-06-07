@@ -1,0 +1,148 @@
+<!--<script src="../dhis-web-commons/ouwt/ouwt.js"></script>-->
+<script src="scripts/tracker-capture.js"></script>
+<link href="styles/jasny-bootstrap.css" rel="stylesheet">
+<script type="text/javascript" src="scripts/js/jasny-bootstrap.js"></script>
+
+<script type="text/javascript" src="scripts/js/import-aggregateData.js"></script>
+<script type="text/javascript" src="scripts/js/xlsx.js"></script>
+<script type="text/javascript" src="scripts/js/jquery.fileDownload.js"></script>
+
+
+       <!--<script src="scripts/js/bootstrap-datetimepicker.min.js"></script>-->
+ <style>
+     .ui-datepicker-calendar {
+         display: none;
+     }
+ </style>
+
+
+
+<script>
+    $(document).ready(function () {
+        //called when key is pressed in textbox
+
+        $('.monthYearPicker').datepicker({
+            changeMonth: true,
+            changeYear: true,
+            showButtonPanel: true,
+            dateFormat: 'MM yy'
+        }).focus(function() {
+                    var thisCalendar = $(this);
+                    $('.ui-datepicker-calendar').detach();
+                    $('.ui-datepicker-close').click(function() {
+                        var month = $("#ui-datepicker-div .ui-datepicker-month :selected").val();
+                        var year = $("#ui-datepicker-div .ui-datepicker-year :selected").val();
+                        thisCalendar.datepicker('setDate', new Date(year, month, 1));
+                    });
+                });
+
+        $("#rowno").keypress(function (e) {
+            //if the letter is not digit then display error and don't type anything
+            if (e.which != 8 && e.which != 0 && (e.which < 48 || e.which > 57)) {
+                //display error message
+                $("#errmsg").html("Digits Only").show().fadeOut(800);
+                return false;
+            }else
+            {
+                $('#import').attr('disabled', false);
+            }
+        });
+
+        $(document).on("click", "a.myDownload", function () {
+            $.fileDownload($(this).prop('href'), {
+            });
+            return false; //this is critical
+        });
+
+    });
+</script>
+
+<div id="leftBar">
+    <div class="left-bar-menu" ng-controller="LeftBarMenuController">
+        <ul class="nav nav-pills nav-stacked">
+
+            <li><a href ng-click="importData()">{{'data_import' | translate}}</a></li>
+            <li><a href ng-click="importAggregateData()">{{'dataImport_aggregate'| translate}}</a></li>
+            <!--
+            <li><a href ng-click="showHome()">{{'registration_and_data_entry'| translate}}</a></li>
+            <li><a href ng-click="showReportTypes()">{{'reports'| translate}}</a></li>
+            -->
+        </ul>
+    </div>
+</div>
+
+<div class="container" id="mainPage">
+
+    <div class="row">
+        <div class=" col-md-4 col-sm-4" >
+            <h2><small><i class="fa fa-list-alt fa-2x black"></i></small><span class="horizonal-spacing">{{'aggregate_excel_data_import'| translate}}</span></h2>
+        </div>
+        <div class=" col-md-4 col-sm-4 col-md-offset-4" >
+            <a href="excelTemplate/Excel_import-_aggregate_data.xlsx" class="btn btn-default info myDownload">Download Template Excel File </a>
+        </div>
+    </div>
+
+    <div class="row" id="notification_bar">
+        <div class="col-md-12"><div class="alert alert-info" role="alert"><strong>Welcome to aggregate excel data import.</strong></div></div>
+    </div>
+
+    <div class="row" id="mothPick">
+        <div class='col-md-2'>
+            <input type="text" name="myDate" id="month" placeholder="Select Month" class="monthYearPicker form-control" readonly />
+            <span class="horizonal-spacing"></span>
+        </div>
+    </div>
+
+    <div class="row" id="mainDiv">
+        <div class="col-md-5" >
+
+            <div class="input-group">
+                <input type="number" class="form-control" data-placement="bottom" id="rowno" placeholder="Enter last row number">
+                <span class="horizonal-spacing" id="errmsg"></span>
+            </div>
+
+            <div class="form-group">
+                <div class="fileinput fileinput-new input-group" data-provides="fileinput" id="fileinput_id">
+                    <div class="form-control" data-trigger="fileinput"><i
+                            class="glyphicon glyphicon-file fileinput-exists"></i> <span class="fileinput-filename"></span>
+                    </div>
+                <span class="input-group-addon btn btn-default btn-file"><span class="fileinput-new">Select file</span><span class="fileinput-exists">Change</span>
+                    <input type="file" id="fileInput" accept=".xlsx" ></span>
+                    <a href="#" class="input-group-addon btn btn-default fileinput-exists"
+                       data-dismiss="fileinput">Remove</a>
+                </div>
+
+                <button class="btn btn-success vertical-spacing" type="submit" id="import" onclick="uploadFile()" disabled>Import</button>
+                <a href="#" class="btn btn-primary vertical-spacing horizonal-spacing">Cancel</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row" id="alertDiv" style="display: none">
+        <div class="alert alert-success fade in" role="alert">
+            <button class="close" data-dismiss="alert" type="button"></button>
+            <strong id="importAlertContent">Data import started. Please wait, this might take a while.</strong>
+        </div>
+        <button class="btn btn-success vertical-spacing" type="submit" id="back" style="display: none" onclick="goback()">Back to Import</button>
+    </div>
+
+    <div id="summaryDiv" style="display: none">
+
+        <table class="table table-hover" id="summary">
+            <caption><h1><span class="label label-default">Import Summary</span></h1></caption>
+            <thead>
+            <tr>
+                <th>Status</th>
+                <th>Total count</th>
+                <th>Reason</th>
+            </tr>
+            </thead>
+            <tbody>
+
+            </tbody>
+        </table>
+    </div>
+    <div id="contentDiv">
+
+    </div>
+</div>

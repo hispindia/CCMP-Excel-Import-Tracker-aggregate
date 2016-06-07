@@ -1,0 +1,40 @@
+<div ng-switch="teiCount">                    
+    <div ng-switch-when="undefined">
+        <div class="alert alert-warning vertical-spacing">
+            {{'no'| translate}} {{selectedProgram.trackedEntity.name|| 'records' | translate}} {{'found'| translate}}                        
+        </div>
+    </div>
+    <div ng-switch-when="0">  
+        <div class="alert alert-warning vertical-spacing">
+            {{'no'| translate}} {{selectedProgram.trackedEntity.name|| 'records' | translate}} {{'found'| translate}}                        
+        </div>
+    </div>    
+    <div ng-switch-default> 
+        
+        <!-- entity begins -->
+        <div class="vertical-spacing">
+            <table class="table table-striped dhis2-table-hover">               
+                <thead>                        
+                    <tr>
+                        <th ng-show="gridColumn.show" ng-repeat="gridColumn in gridColumns">
+                            {{gridColumn.name}}
+                        </th>                                    
+                    </tr>                        
+                </thead>
+                <tbody id="list">
+                    <tr ng-repeat="trackedEntity in trackedEntityList.rows" 
+                        ng-click="assignRelationship(trackedEntity)"
+                        ng-show="trackedEntity.id !== selectedTei.trackedEntityInstance">
+                        <td ng-show="gridColumn.show"                                            
+                            ng-repeat="gridColumn in gridColumns">                                                
+                            {{trackedEntity[gridColumn.id]}}                                                
+                        </td>
+                    </tr>
+                </tbody>        
+            </table>
+        </div>
+        <!-- entity ends -->  
+        <serverside-paginator></serverside-paginator> 
+                  
+    </div>
+</div> 

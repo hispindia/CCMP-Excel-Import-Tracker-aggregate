@@ -1,0 +1,216 @@
+#set($xmlString = $XMLcontent)
+
+<script>
+    $(document).ready(function(){
+
+         if( typeof window.DOMParser === "undefined" ){
+            window.DOMParser = function(){};
+
+            window.DOMParser.prototype.parseFromString = function(str, contentType){
+                if(typeof ActiveXObject !== 'undefined'){
+                    var xmldata = new ActiveXObject('MSXML.DomDocument');
+                    xmldata.async = false;
+                    xmldata.loadXML(str);
+                    return xmldata;
+                } else
+                if(typeof XMLHttpRequest !== 'undefined'){
+                    var xmldata = new XMLHttpRequest;
+
+                    if(!contentType){
+                        contentType = 'application/xml';
+                    }
+
+                    xmldata.open('GET', 'data:' + contentType + ';charset=utf-8,' + encodeURIComponent(str), false);
+
+                    if(xmldata.overrideMimeType) {
+                        xmldata.overrideMimeType(contentType);
+                    }
+
+                    xmldata.send(null);
+                    return xmldata.responseXML;
+                }
+            };
+        }
+    });
+
+    var parser = new DOMParser();
+    var xmlObject = parser.parseFromString('${xmlString}', "text/xml");
+
+    var trackedEntity = $(xmlObject).find("de-codes").find("meta").find("trackedEntity").text(),
+        orgunit_col = $(xmlObject).find("de-codes").find("registration").find("orgunit").attr('col'),
+        uniqueKey = $(xmlObject).find("de-codes").find("meta").find("uniquekey").text();
+
+    var mwraUid_Col  = $(xmlObject).find("de-codes").find("registration").find("attribute").attr('col');
+    var mwraUid = $( xmlObject ).find("de-codes").find("registration").find("attribute").text();
+
+
+	//registration JSON object creation to send to api
+    /*--------------------------------------------------------------------------------------------*/
+    var registrationJSON = {
+        "trackedEntity": trackedEntity.toString(),
+    };
+    var registerAttributeMap = new Object();
+
+    $( xmlObject ).find("de-codes").find("registration").find("attribute").each(function(){
+        var  attributeUId = $(this).text(),
+             colno =  $(this).attr('col');
+             registerAttributeMap[attributeUId] = colno ;
+    });
+    /*--------------------------------------------------------------------------------------------*/
+
+    /*---------------------------------------------------------------------------------------------*/
+
+    //program and programstage JSON object creation to send to api
+    /*-------------------------------------------------------------------------------------------*/
+
+    var program = $( xmlObject ).find("de-codes").find("programStage").find("program").text();
+    var programStage = $( xmlObject ).find("de-codes").find("programStage").find("programStage").text();
+    var status = $( xmlObject ).find("de-codes").find("programStage").find("status").text();
+
+    /*---------------------------------------------------------------------------------------------*/
+
+
+    //event1 JSON object creation to send to api
+    /*-------------------------------------------------------------------------------------------*/
+
+    var event1_date_col = $( xmlObject ).find("de-codes").find("event1").find("date").attr("col");
+
+    var datavalue1Map = new Object();
+
+    var event1JSON = {
+        "program": program,
+        "status": "COMPLETED",
+        "programStage": programStage
+    };
+
+    $( xmlObject ).find("de-codes").find("event1").find("dataValues").find("de-code").each(function(){
+        var  dataElementUId = $(this).text(),
+             colno =  $(this).attr('col');
+        datavalue1Map[dataElementUId] = colno ;
+    });
+
+
+    //event2 JSON object creation to send to api
+    /*-------------------------------------------------------------------------------------------*/
+
+    var event2_date_col = $( xmlObject ).find("de-codes").find("event2").find("date").attr("col");
+
+    var datavalue2Map = new Object();
+
+    var event1JSON = {
+      "program": program,
+      "status": "COMPLETED",
+      "programStage": programStage
+    };
+
+    $( xmlObject ).find("de-codes").find("event1").find("dataValues").find("de-code").each(function(){
+      var  dataElementUId = $(this).text(),
+           colno =  $(this).attr('col');
+      datavalue2Map[dataElementUId] = colno ;
+    });
+
+
+
+    /*---------------------------------------------------------------------------------------------*/
+
+    for(var row = 1; row < lastRowNo ; row++)
+    {
+		//alert( "inside import.vm 4 " + row + " -- " + orgunit_col );
+		
+        var attributeValue = ExcelCellMap[row+'_'+mwraUid_Col];
+        if( mwraUid != undefined && attributeValue != undefined )
+        {
+
+        }
+
+
+
+
+
+
+
+        if(orgUnitCode != undefined)
+        {
+            var programEnrollmentDate = ExcelCellMap[row+'_'+enrollmentDate_col];
+            var uniquKeyValue = new String();
+
+            var attributes=[];
+            var datavalues = [];
+
+            for(var attributeUid in registerAttributeMap)
+            {
+
+                var item = {};
+                item ["attribute"] = attributeUid;
+
+                if(ExcelCellMap[row+'_'+registerAttributeMap[attributeUid]] != undefined){
+
+                    item ["value"] = ExcelCellMap[row+'_'+registerAttributeMap[attributeUid]];
+					/*
+                    switch (registerAttributeMap[attributeUid]){
+                        case '4' : uniquKeyValue += ExcelCellMap[row+'_'+registerAttributeMap[attributeUid]]
+                            break;
+                        case '5' : uniquKeyValue += '_'+ ExcelCellMap[row+'_'+registerAttributeMap[attributeUid]]
+                            break;
+                        case '9' : uniquKeyValue += '_'+ ExcelCellMap[row+'_'+registerAttributeMap[attributeUid]]
+                            break;
+                        case '10' : uniquKeyValue += '_'+ ExcelCellMap[row+'_'+registerAttributeMap[attributeUid]]
+                            break;
+                    }
+					*/
+                }
+                else
+                {
+                    item ["value"]="";
+                    //console.log('There is missing value for attribute id in row number '+attributeUid+' '+(row + 1 ));
+                }
+
+                attributes.push(item);
+            }
+			
+			/*
+            var unique = {};
+
+            unique["attribute"] = uniqueKey;
+            unique["value"] = uniquKeyValue ;
+
+            attributes.push(unique);
+			*/
+			
+            for(var dataelement in datavalueMap)
+            {
+                var dataelements = {};
+                dataelements ["dataElement"] = dataelement;
+
+                if( ExcelCellMap[row+'_'+datavalueMap[dataelement]] != undefined ){
+                    dataelements ["value"] = ExcelCellMap[row+'_'+datavalueMap[dataelement]];
+                }else
+                {
+                    dataelements ["value"] = "";
+                }
+                datavalues.push(dataelements);
+            }
+
+
+            //orgUnitUid =  orgUnitUidMap[orgUnitCode.toString().trim()];
+			
+			orgUnitUid =  orgUnitCode.toString().trim();
+			
+            registrationJSON.orgUnit = orgUnitUid ;
+            eventJSON.orgUnit = orgUnitUid;
+
+            registrationJSON.attributes = attributes;
+
+            //enrollmentJSON.dateOfEnrollment = enrollmentDate;
+			enrollmentJSON.orgUnit = orgUnitUid;
+			enrollmentJSON.enrollmentDate = programEnrollmentDate;
+			enrollmentJSON.incidentDate = programEnrollmentDate;
+			
+            eventJSON.eventDate = programEnrollmentDate ;
+            eventJSON.dataValues = datavalues;
+
+            importExcelData(registrationJSON, enrollmentJSON, eventJSON,row);
+       }
+
+    }
+</script>

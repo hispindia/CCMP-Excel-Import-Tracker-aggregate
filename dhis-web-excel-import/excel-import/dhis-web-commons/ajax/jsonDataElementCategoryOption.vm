@@ -1,0 +1,10 @@
+{ "dataElementCategoryOption":
+  {
+    "id":  "${dataElementCategoryOption.id}" ,
+    "uid":  "${dataElementCategoryOption.uid}" ,
+    "name": "$!encoder.jsonEncode( ${dataElementCategoryOption.name} )",
+    "shortName": "$!encoder.jsonEncode( ${dataElementCategoryOption.shortName} )",
+    "startDate": "$!format.formatDate( ${dataElementCategoryOption.startDate} )",
+    "endDate": "$!format.formatDate( ${dataElementCategoryOption.endDate} )"
+  }
+}

@@ -1,0 +1,167 @@
+<div class="bordered-div col-md-12" ng-controller="RegistrationController">
+    <form name="outerForm" novalidate>
+
+        <div ng-if='!selectedProgram'>
+            <h3>{{'category' | translate}}</h3>
+             <table class="table-borderless table-striped">
+                <tr>
+                    <td>
+                        {{'entity_type' | translate}}
+                    </td>
+                    <td>
+                        <select class="form-control" ng-model="trackedEntities.selected" ng-options="trackedEntity.name for trackedEntity in trackedEntities.available | orderBy: 'name'">                                
+                        </select>                            
+                    </td>
+                </tr>                   
+            </table>
+            <hr>
+        </div>
+
+        <h3>{{'profile' | translate}}</h3>
+        <table class="table-borderless table-striped">
+            <tr ng-repeat="attribute in attributes">
+                <td>
+                    <div ng-switch="attribute.name">
+                        <span ng-switch-when="uniqueKey">
+                        </span>
+                        <span ng-switch-default>
+                              {{attribute.name}}
+                        </span>
+                    </div>
+                </td>
+                <td>
+                    <ng-form name="innerForm">     
+                        <div ng-switch="attribute.valueType">
+                            <div ng-switch-when="date">
+                                <input type="text" placeholder="{{dhis2CalendarFormat.keyDateFormat}}" name="foo" class="form-control" d2-date ng-model="attribute.value" ng-required="attribute.mandatory" />
+                                <span ng-show="outerForm.submitted && innerForm.foo.$invalid" class="error">{{'required'| translate}}</span>
+                            </div>
+                            <div ng-switch-when="trueOnly">
+                                <input type="checkbox" name="foo" class="form-control" ng-model="attribute.value" ng-required="attribute.mandatory" />
+                                <span ng-show="outerForm.submitted && innerForm.foo.$invalid" class="error">{{'required'| translate}}</span>
+                            </div>
+                            <div ng-switch-when="bool">
+                                <select name="foo" ng-model="attribute.value" class="form-control" ng-required="attribute.mandatory">
+                                    <option value="">{{'please_select'| translate}}</option>                        
+                                    <option value="false">{{'no'| translate}}</option>
+                                    <option value="true">{{'yes'| translate}}</option>
+                                </select>
+                                <span ng-show="outerForm.submitted && innerForm.foo.$invalid" class="error">{{'required'| translate}}</span>
+                            </div>                            
+                            <div ng-switch-when="optionSet">
+                                <div ng-if="!selectedProgram">
+                                    <input type="text"
+                                       name="foo"
+                                       class="form-control"
+                                       ng-model="attribute.value"                                                 
+                                       typeahead="option.name as option.name for option in optionSets.optionSets[attribute.optionSet.id].options | filter:$viewValue | limitTo:20" 
+                                       typeahead-open-on-focus
+                                       ng-required="attribute.mandatory"/>
+                                </div>
+                                <div ng-if="selectedProgram">
+                                    <div ng-if="!selectedProgram.dataEntryMethod || optionSets.optionSets[attribute.optionSet.id].options.length >= 7">
+                                        <input type="text" 
+                                           name="foo"
+                                           class="form-control"
+                                           ng-model="attribute.value"                                                 
+                                           typeahead="option.name as option.name for option in optionSets.optionSets[attribute.optionSet.id].options | filter:$viewValue | limitTo:20" 
+                                           typeahead-open-on-focus
+                                           typeahead-editable=false
+                                           ng-required="attribute.mandatory"/>
+                                    </div>
+                                    <div ng-if="selectedProgram.dataEntryMethod && optionSets.optionSet[attribute.optionSet.id].options.length < 7">
+                                        <label>                                        
+                                            <input type="radio"
+                                                name={{attribute.id}}
+                                                ng-required="attribute.mandatory"
+                                                ng-model="attribute.value"
+                                                value=""> {{'no_value' | translate}}<br>                                       
+                                        </label><br>
+                                        <span ng-repeat="option in optionSets.optionSets[attribute.optionSet.id].options">
+                                            <label>
+                                                <input type="radio"
+                                                    name={{attribute.id}}
+                                                    ng-required="attribute.mandatory"
+                                                    ng-model="attribute.value" 
+                                                    value={{option.name}}> {{option.name}}
+                                            </label><br>
+                                        </span>                                            
+                                    </div>
+                                </div>                                
+                                <span ng-show="outerForm.submitted && innerForm.foo.$invalid" class="error">{{'required'| translate}}</span>
+                            </div>
+                            <div ng-switch-when="number">
+                                <input type="number" name="foo" class="form-control" ng-model="attribute.value" ng-required="attribute.mandatory"/>
+                                <span ng-show="outerForm.submitted && innerForm.foo.$invalid" class="error">{{'required'| translate}}</span>
+                            </div>
+                            <div ng-switch-when="email">
+                                <input type="email" name="foo" class="form-control" ng-model="attribute.value" ng-required="attribute.mandatory"/>
+                                <span ng-show="outerForm.submitted && innerForm.foo.$invalid" class="error">{{'required'| translate}}</span>
+                            </div>
+                            <div ng-switch-default>
+                                <div ng-switch="attribute.name">
+                                    <div ng-switch-when="uniqueKey">
+                                        <input type="text" name="foo" ng-hide="true" class="form-control" ng-model="attribute.value" />
+                                    </div>
+                                    <div ng-switch-default>
+                                        <input type="text" name="foo" class="form-control" ng-model="attribute.value" ng-required="attribute.mandatory"/>
+                                        <span ng-show="outerForm.submitted && innerForm.foo.$invalid" class="error">{{'required'| translate}}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </ng-form>
+                </td>
+            </tr>
+        </table>
+
+        <div ng-if='selectedProgram'>
+            <hr>
+            <h3>{{'enrollment' | translate}}</h3>
+            <table class="dhis2-list-table-striped dhis2-table-hover">
+                <tr>
+                    <td>
+                        {{selectedProgram.dateOfEnrollmentDescription}}
+                    </td>
+                    <td>
+                        <input type="text" 
+                               placeholder="{{dhis2CalendarFormat.keyDateFormat}}" 
+                               name="dateOfEnrollment" 
+                               class="form-control" 
+                               d2-date 
+                               ng-model="enrollment.dateOfEnrollment" 
+                               max-date="selectedProgram.selectEnrollmentDatesInFuture ? '' : 0"
+                               min-date=""
+                               ng-required="true"/>
+                        <span ng-show="outerForm.submitted && outerForm.dateOfEnrollment.$invalid" class="error">{{'required'| translate}}</span>
+                    </td>
+                </tr>     
+                <tr ng-if="selectedProgram.displayIncidentDate">
+                    <td>
+                        {{selectedProgram.dateOfIncidentDescription}}
+                    </td>
+                    <td>
+                        <input type="text" 
+                               placeholder="{{dhis2CalendarFormat.keyDateFormat}}"
+                               name="dateOfIncident"
+                               class="form-control" 
+                               d2-date 
+                               max-date="selectedProgram.selectIncidentDatesInFuture ? '' : 0"
+                               min-date=""
+                               ng-model="enrollment.dateOfIncident"/>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <div ng-if="!valueExists  && outerForm.submitted">
+            <div class="alert alert-warning">{{'form_is_empty_fill_at_least_one'| translate}}</div> 
+        </div>
+
+        <div class="vertical-spacing">                
+            <button type="button" class="btn btn-primary" ng-click="registerEntity('DASHBOARD')">{{'save_and_continue'| translate}}</button>
+            <button type="button" class="btn btn-success small-horizonal-spacing" ng-click="registerEntity('SELF')">{{'save_and_add_new'| translate}}</button>
+            <button type="button" class="btn btn-default small-horizonal-spacing" ng-click="showRegistration()">{{'cancel'| translate}}</button>
+        </div>
+    </form>
+</div>

@@ -1,0 +1,276 @@
+<script src="../dhis-web-commons/ouwt/ouwt.js"></script>
+<script src="scripts/tracker-capture.js"></script>
+
+<div id="leftBar">
+    <div class="left-bar-menu" ng-controller="LeftBarMenuController">
+        <ul class="nav nav-pills nav-stacked">
+            <!--
+            <li><a href ng-click="showHome()">{{'registration_and_data_entry' | translate}}</a></li>
+            <li><a href ng-click="showReportTypes()">{{'reports' | translate}}</a></li>
+            -->
+
+            <li><a href ng-click="importData()">{{'data_import' | translate}}</a></li>
+            <li><a href ng-click="importAggregateData()">{{'dataImport_aggregate'| translate}}</a></li>
+
+        </ul>
+    </div>        
+    
+    <div id="orgUnitTree" style="margin-top:20px">
+        <ul>
+        </ul>
+    </div>
+    <!--<img id="ouwt_loader" src="../images/ajax-loader-bar.gif"/>-->
+</div>
+
+<div class="page" id="mainPage">
+    
+    <img src="../images/ajax-loader-bar.gif" alt="{{'in_progress'| translate}}" ng-if="!selectedOrgUnit"/>
+
+    <div ng-show="selectedOrgUnit">
+        <!-- top bar begins -->
+        <div class="row top-bar">        
+            <div class="col-sm-12">            
+                <span ng-if='searchState'>
+                    {{selectedProgram.trackedEntity.name}} {{'search'| translate}}
+                </span>
+                <span ng-if='showRegistrationDiv'>
+                    {{selectedProgram.trackedEntity.name}} {{'register'| translate}}
+                </span>        
+                <span ng-if='showReportDiv'>
+                    {{selectedProgram.name}} {{'report'| translate}}
+                </span>
+                <div class="pull-right not-printable">
+                    <div class="btn-group" dropdown is-open="status.isopen">
+                        <button type="button" class="btn btn-default dropdown-toggle" ng-disabled="trackedEntityList.rows.length <= 0">
+                            <i class="fa fa-cog" title="{{'settings'| translate}}"></i>
+                        </button>
+                        <ul class="dropdown-menu pull-right" role="menu">
+                            <li ng-show="trackedEntityList.rows.length > 0"><a href ng-click="showHideColumns()">{{'show_hide_columns'| translate}}</a></li>
+                        </ul>
+                    </div>
+                </div>            
+            </div>        
+        </div>
+        <!-- top bar ends -->
+
+        <!--- selected org unit begins -->
+        <input type="text" selected-org-unit ng-model="selectedOrgUnit.name" ng-hide=true>
+        <!--- selected org unit ends  -->
+
+        <!--- search, registration and reporting menu begins -->
+        <div class="row vertical-spacing not-for-screen">
+            <div class="col-md-4">
+                <h4>{{'org_unit' | translate}}</h4>
+            </div>
+            <div class="col-md-4">
+                <input type="text" class="form-control" ng-disabled='true' value="{{selectedOrgUnit.name}}">
+            </div>
+        </div>
+        <div class="row"> 
+            <div id="selectDropDownParent" class="input-group col-md-4">            
+                <button type="button" class="select-dropdown-button form-control" ng-show="programs.length > 0">{{selectedProgram ? selectedProgram.name : 'please_select_a_program'| translate}}</button>
+                <button type="button" class="select-dropdown-button form-control" ng-show="programs.length < 1" ng-disabled="true">{{programs.length > 0 ? 'please_select_a_program' : 'no_program_exists' | translate}}</button>
+                <div class="input-group-btn">
+                    <button class="btn btn-default select-dropdown-caret" type="button" title="{{'list_programs'| translate}}" data-toggle="dropdown" ng-disabled="programs.length < 1"><i class="fa fa-caret-down"></i></button>
+                    <ul id="selectDropDown" class="dropdown-menu dropdown-menu-right">
+                        <li>
+                            <a href ng-click="getProgramAttributes(null)">{{'please_select_a_program' | translate}}</a>
+                        </li>
+                        <li ng-repeat="program in programs| orderBy: 'name'">
+                            <a href ng-click="getProgramAttributes(program)">{{program.name}}</a>
+                        </li>
+                    </ul>
+                </div>                
+            </div>
+            <div id="searchDropDownParent" class="input-group col-md-4 not-printable">
+                <input type="text" placeholder="{{'type_here_for_simple_search'| translate}}" ng-model="searchText" class="form-control expanded" d2-enter="search(searchMode.freeText)" ng-class="{true: 'invalid-input'} [!searchText && emptySearchText]" ng-focus="showHideSearch()" ng-disabled="showRegistrationDiv || showReportDiv">
+                <div class="input-group-btn">
+                    <button class="btn btn-default search-dropdown-button trim" type="button" title="{{'advanced_search'| translate}}" data-toggle="dropdown" ng-click="showHideSearch()" ng-disabled="showRegistrationDiv || showReportDiv"><i class="fa fa-caret-down"></i></button>
+                    <button class="btn btn-primary trim" type="button" title="{{'search'| translate}}" ng-disabled="showRegistrationDiv || showReportDiv" ng-click="search(searchMode.freeText)"><i class="fa fa-search"></i></button>
+                    <div id="searchDropDown" class="dropdown-menu dropdown-menu-right">
+                        <form name="searchForm">
+                            <div class="search-container-main">
+                                <div class="search-container">    
+                                    <table data-stop-propagation="true" class="table-borderless table-striped">
+                                        <tr>
+                                            <td>{{'org_unit'| translate}}</td>
+                                            <td>                    
+                                                <label><input type="radio" ng-model="selectedOuMode.name" name="selected" value="SELECTED"> {{'SELECTED'| translate}}</label><br/>
+                                                <label><input type="radio" ng-model="selectedOuMode.name" name="children" value="CHILDREN"> {{'CHILDREN'| translate}}</label><br/>
+                                                <label><input type="radio" ng-model="selectedOuMode.name" name="descendants" value="DESCENDANTS"> {{'DESCENDANTS'| translate}}</label><br/>
+                                                <label><input type="radio" ng-model="selectedOuMode.name" name="accessible" value="ACCESSIBLE"> {{'ACCESSIBLE'| translate}}</label>
+                                            </td>
+                                        </tr>
+                                        <tr ng-if="selectedProgram">
+                                            <td>{{'enrollment_date'| translate}}</td>
+                                            <td>
+                                                <div class="dataelement-filter">
+                                                    <div class="filter-operator">
+                                                        <select ng-model="enrollment.operator" class="form-control-select2" ng-options="operator | translate for operator in defaultOperators">
+                                                        </select>
+                                                    </div>
+                                                    <div class="filter-value" ng-show="enrollment.operator === defaultOperators[0]">
+                                                        <input type="text" placeholder="{{'exact_date'| translate}}" class="form-control-select2" d2-date max-date="0" ng-model="enrollment.programExactDate"/>
+                                                    </div>
+                                                    <div class="filter-value" ng-show="enrollment.operator === defaultOperators[1]">
+                                                        <div class="container-1-2">
+                                                            <input type="text" placeholder="{{'start_date'| translate}}" class="form-control-select2" d2-date ng-model="enrollment.programStartDate"/>
+                                                        </div>
+                                                        <div class="container-1-2">
+                                                            <input type="text" placeholder="{{'end_date'| translate}}" class="form-control-select2" d2-date ng-model="enrollment.programEndDate"/>                
+                                                        </div>
+                                                    </div>                    
+                                                </div>                
+                                            </td>
+                                        </tr>
+                                        <tr ng-repeat="attribute in attributes">
+                                            <td>
+                                                <div ng-switch="attribute.name">
+                                                <span ng-switch-when="uniqueKey">
+                                                </span>
+                                                <span ng-switch-default>
+                                                      {{attribute.name}}
+                                                </span>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div ng-switch="attribute.valueType">
+                                                    <div ng-switch-when="number">
+                                                        <div class="dataelement-filter">                                                
+                                                            <div class="filter-operator">
+                                                                <select ng-model="attribute.operator" class="form-control-select2" ng-options="operator | translate for operator in defaultOperators">
+                                                                </select>
+                                                            </div>
+                                                            <div class="filter-value" ng-show="attribute.operator === defaultOperators[0]">
+                                                                <input type="number" placeholder="{{'exact_value'| translate}}" class="form-control-select2" ng-model="attribute.exactValue"/>
+                                                            </div>
+                                                            <div class="filter-value" ng-show="attribute.operator === defaultOperators[1]">
+                                                                <div class="container-1-2">
+                                                                    <input type="number" placeholder="{{'from'| translate}}" class="form-control-select2" ng-model="attribute.startValue"/>
+                                                                </div>
+                                                                <div class="container-1-2">
+                                                                    <input type="number" placeholder="{{'to'| translate}}" class="form-control-select2" ng-model="attribute.endValue"/>                
+                                                                </div>
+                                                            </div>                            
+                                                        </div>                        
+                                                    </div>
+                                                    <div ng-switch-when="date">
+                                                        <div class="dataelement-filter">
+                                                            <div class="filter-operator">
+                                                                <select ng-model="attribute.operator" class="form-control-select2" ng-options="operator | translate for operator in defaultOperators">
+                                                                </select>
+                                                            </div>
+                                                            <div class="filter-value" ng-show="attribute.operator === defaultOperators[0]">
+                                                                <input type="text" placeholder="{{'exact_date'| translate}}" class="form-control-select2" d2-date ng-model="attribute.exactValue"/>
+                                                            </div>
+                                                            <div class="filter-value" ng-show="attribute.operator === defaultOperators[1]">
+                                                                <div class="container-1-2">
+                                                                    <input type="text" placeholder="{{'start_date'| translate}}" class="form-control-select2" d2-date ng-model="attribute.startValue"/>
+                                                                </div>
+                                                                <div class="container-1-2">
+                                                                    <input type="text" placeholder="{{'end_date'| translate}}" class="form-control-select2" d2-date ng-model="attribute.endValue"/>                
+                                                                </div>
+                                                            </div>                            
+                                                        </div> 
+                                                    </div>                        
+                                                    <div ng-switch-when="optionSet">
+                                                        <select multiple ui-select2  ng-model="attribute.value" data-placeholder="{{'please_select'| translate}}" style="width:100%;">
+                                                            <option ng-repeat="option in optionSets.optionSets[attribute.optionSet.id].options | filter:$viewValue | limitTo:100" value="{{option.code}}">{{option.name}}</option>
+                                                        </select>
+                                                    </div>
+                                                    <div ng-switch-when="bool">
+                                                        <select ui-select2 multiple ng-model="attribute.value" data-placeholder="{{'please_select'| translate}}" style="width:100%;">
+                                                            <option ng-repeat="option in boolOperators" value="{{option}}">{{option| translate}}</option>
+                                                        </select>
+                                                    </div> 
+                                                    <div ng-switch-default>
+                                                        <div ng-switch="attribute.name">
+                                                            <div ng-switch-when="uniqueKey">
+                                                            </div>
+                                                            <div ng-switch-default>
+                                                                <input type="text" class="form-control-select2" ng-model="attribute.value" />
+                                                            </div>
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>         
+                                    </table>
+                                </div>
+
+                                <div class="horizonal-spacing">
+                                    <button type="button"
+                                            class="btn btn-primary"
+                                            ng-click="search(searchMode.attributeBased)">
+                                        {{'search'| translate}}
+                                    </button>
+                                    <button type="button" 
+                                            class="btn btn-success small-horizonal-spacing" 
+                                            ng-click="search(searchMode.listAll)">
+                                        {{'list_all'| translate}}
+                                    </button>        
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>                
+            </div>        
+            <div class="col-md-4 trim not-printable">            
+                <button type="button" 
+                        class="btn btn-success"
+                        ng-disabled="showRegistrationDiv || showReportDiv"
+                        ng-click="search(searchMode.listAll)">
+                    {{'list_all'| translate}}
+                </button>
+                <button type="button" 
+                        class="btn btn-primary"
+                        ng-disabled="showReportDiv"
+                        ng-click="showRegistration()">                    
+                    {{'register'| translate}}
+                </button>
+                <button type="button" 
+                        class="btn btn-info"
+                        ng-if="teiCount > 0"
+                        onclick="javascript:window.print()">                    
+                    {{'print'| translate}}
+                </button>
+            </div>
+        </div>
+        <!--- search, registration and reporting menu ends -->
+
+        <!--- Error display for search begins -->
+        <div class="row" ng-if="emptySearchAttribute || !searchText && emptySearchText">
+            <div class="col-md-8 vertical-spacing">
+                <div class="alert alert-warning">{{'search_input_required'| translate}}</div>         
+            </div>
+        </div>
+        <!--- Error display for search ends -->
+
+        <!--registration form begins -->
+        <div class="row" ng-if="showRegistrationDiv">
+            <div class="col-md-8">
+                <div ng-include="'components/registration/registration.html'"></div>             
+            </div>
+        </div>
+        <!-- registration form ends -->
+
+        <!--report div begins -->
+        <div class="row" ng-if="showReportDiv">
+            <div class="col-md-8">
+                <div ng-include="'components/report/report.html'"></div>             
+            </div>
+        </div>
+        <!-- report div ends -->
+
+        <!-- entity grid begins -->
+        <img src="../images/ajax-loader-bar.gif" alt="{{'in_progress' | translate}}" ng-if="!teiFetched && searchText && !emptySearchTex"/>
+        <div class="row" ng-if="showTrackedEntityDiv">
+            <div class="col-md-12" ng-include="'views/tei.html'"></div>  
+        </div>
+        <!-- entity grid ends -->
+    </div>
+    
+</div>           
+
+

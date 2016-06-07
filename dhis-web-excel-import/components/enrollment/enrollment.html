@@ -1,0 +1,225 @@
+<div class="panel panel-info" ng-controller="EnrollmentController">
+    <div class="panel-heading handle bold">                                            
+        {{enrollmentWidget.title| translate}}
+        <span class="nav-pills" ng-show="selectedProgram && !selectedEnrollment">
+            | <a href ng-click="showNewEnrollment()" title="{{'new'| translate}}"><span class="bold">{{'new'| translate}}</span></a>
+        </span>
+        <span class="nav-pills" ng-show="terminatedEnrollments.length > 0 || completedEnrollments.length > 0">
+            | <a href ng-click="showEnrollmentHistory()" title="{{'history'| translate}}"><span class="bold">{{'history'| translate}}</span></a>
+        </span>        
+        <span class="pull-right">
+            <a class="small-horizonal-spacing" href ng-click="expandCollapse(enrollmentWidget)">
+                <span ng-show="enrollmentWidget.expand"><i class="fa fa-chevron-up" title="{{'collapse'| translate}}"></i></span>
+                <span ng-show="!enrollmentWidget.expand"><i class="fa fa-chevron-down" title="{{'expand'| translate}}"></i></span>
+            </a>
+            <a class="small-horizonal-spacing" href ng-click="removeWidget(enrollmentWidget)" title="{{'remove'| translate}}"><i class="fa fa-times-circle"></i></a>            
+        </span>
+    </div>
+    <div ng-show="enrollmentWidget.expand" class="panel-body dashboard-widget-container">
+        <!-- operations on selected enrollment begins -->
+        <div ng-if="selectedEnrollment && !showEnrollmentHistoryDiv && !showReSchedulingDiv">
+            <table class="table-borderless table-striped">
+                <tr class="col-md-12">
+                    <td class="col-md-6">
+                        {{selectedProgram.dateOfEnrollmentDescription}}
+                    </td>
+                    <td class="col-md-6">
+                        <input type="text" placeholder="{{dhis2CalendarFormat.keyDateFormat}}" class="form-control" d2-date ng-model="selectedEnrollment.dateOfEnrollment" ng-disabled="true"/>
+                    </td>
+                </tr>
+                <tr class="col-md-12" ng-if="selectedProgram.displayIncidentDate">                    
+                    <td class="col-md-6">
+                        {{selectedProgram.dateOfIncidentDescription}}
+                    </td>
+                    <td class="col-md-6">
+                        <input type="text" placeholder="{{dhis2CalendarFormat.keyDateFormat}}" class="form-control" d2-date ng-model="selectedEnrollment.dateOfIncident" ng-disabled="true"/>
+                    </td>
+                </tr>                
+            </table>
+            
+            
+            <div class="vertical-spacing horizonal-spacing">
+
+                <button type="button" 
+                        class="btn btn-primary"
+                        ng-click="completeEnrollment()">
+                    {{'complete'| translate}}
+                </button>
+                <button type="button" 
+                        class="btn btn-warning"
+                        ng-click="terminateEnrollment()">
+                    {{'terminate'| translate}}
+                </button>   
+                
+                <button type="button"
+                        title="{{'unmark_for_followup' | translate}}"
+                        class="btn btn-danger horizonal-spacing"
+                        ng-if="selectedEnrollment.followup"
+                        ng-click="markForFollowup()">
+                    <i class="fa fa-exclamation-triangle"></i>
+                </button>
+                <button type="button" 
+                        title="{{'mark_for_followup' | translate}}"
+                        class="btn btn-default horizonal-spacing"
+                        ng-if="!selectedEnrollment.followup"
+                        ng-click="markForFollowup()">
+                    <i class="fa fa-exclamation-triangle"></i>
+                </button>
+                
+            </div>
+        </div>
+        <!-- operations on selected enrollment ends -->
+
+        <!-- new enrollment registration form begins -->
+        <form name="outerForm" novalidate>
+            <div ng-if="showEnrollmentDiv">
+                <table class="table-borderless">
+                    <tr class="col-md-12">
+                        <td class="col-md-6">
+                            {{selectedProgram.dateOfEnrollmentDescription}}
+                        </td>
+                        <td class="col-md-6">
+                            <input type="text" 
+                                   placeholder="{{dhis2CalendarFormat.keyDateFormat}}" 
+                                   name="dateOfEnrollment" 
+                                   class="form-control" 
+                                   d2-date 
+                                   max-date="selectedProgram.selectEnrollmentDatesInFuture ? '' : 0"
+                                   ng-model="newEnrollment.dateOfEnrollment" 
+                                   ng-required="true"/>
+                            <span ng-show="outerForm.submitted && outerForm.dateOfEnrollment.$invalid" class="red">{{'required'| translate}}</span>
+                        </td>
+                    </tr>     
+                    <tr class="col-md-12" ng-if="selectedProgram.displayIncidentDate">
+                        <td class="col-md-6">
+                            {{selectedProgram.dateOfIncidentDescription}}
+                        </td>
+                        <td class="col-md-6">
+                            <input type="text" 
+                                   placeholder="{{dhis2CalendarFormat.keyDateFormat}}" 
+                                   class="form-control" 
+                                   d2-date
+                                   max-date="selectedProgram.selectIncidentDatesInFuture ? '' : 0"
+                                   ng-model="newEnrollment.dateOfIncident" 
+                                   max-date="today"/>
+                        </td>
+                    </tr>
+                </table>
+                <hr ng-if='attributesForEnrollment'>
+                
+                <table class="table-borderless table-striped">
+                    <tr class="col-md-12" ng-repeat="attribute in attributesForEnrollment">
+                        <td class="col-md-6">
+                            {{attribute.name}}
+                        </td>
+                        <td class="col-md-6">
+                            <ng-form name="innerForm">
+                                <div ng-switch="attribute.valueType">
+                                    <div ng-switch-when="date">
+                                        <input type="text" 
+                                               placeholder="{{dhis2CalendarFormat.keyDateFormat}}" 
+                                               class="form-control" 
+                                               name="foo" 
+                                               max-date="attribute.allowFutureDate ? '' : 0"
+                                               d2-date 
+                                               ng-model="attribute.value" 
+                                               ng-required="attribute.mandatory"/>                                        
+                                    </div>
+                                    <div ng-switch-when="trueOnly">
+                                        <input type="checkbox" class="form-control" name="foo" ng-model="attribute.value" ng-required="attribute.mandatory"/>                                        
+                                    </div>
+                                    <div ng-switch-when="bool">
+                                        <select ng-model="attribute.value" name="foo" class="form-control" ng-required="attribute.mandatory">
+                                            <option value="">{{'please_select'| translate}}</option>                        
+                                            <option value="false">{{'no'| translate}}</option>
+                                            <option value="true">{{'yes'| translate}}</option>
+                                        </select>                                        
+                                    </div>
+                                    <div ng-switch-when="optionSet">
+                                        <div ng-if="!selectedProgram.dataEntryMethod || optionSets.optionSets[attribute.optionSet.id].options.length >= 7">
+                                            <input type="text" 
+                                               name="foo"
+                                               class="form-control"
+                                               ng-model="attribute.value"                                                 
+                                               typeahead="option.name as option.name for option in optionSets.optionSets[attribute.optionSet.id].options | filter:$viewValue | limitTo:20" 
+                                               typeahead-open-on-focus
+                                               typeahead-editable="false"
+                                               ng-required="attribute.mandatory"/>
+                                        </div>
+                                        <div ng-if="selectedProgram.dataEntryMethod && optionSets.optionSets[attribute.optionSet.id].options.length < 7">
+                                            <label>                                        
+                                                <input type="radio"
+                                                    name={{attribute.id}}
+                                                    ng-required="attribute.mandatory"
+                                                    ng-model="attribute.value"
+                                                    value=""> {{'no_value' | translate}}<br>                                       
+                                            </label><br>
+                                            <span ng-repeat="option in optionSets.optionSets[attribute.optionSet.id].options">
+                                                <label>
+                                                    <input type="radio"
+                                                        name={{attribute.id}}
+                                                        ng-required="attribute.mandatory"
+                                                        ng-model="attribute.value" 
+                                                        value={{option.name}}> {{option.name}}
+                                                </label><br>
+                                            </span>                                            
+                                        </div>
+                                    </div>
+                                    <div ng-switch-when="number">
+                                        <input type="number" 
+                                               class="form-control" 
+                                               name="foo" 
+                                               ng-model="attribute.value" 
+                                               ng-required="attribute.mandatory"/>                                        
+                                    </div>
+                                    <div ng-switch-default>
+                                        <input type="text" 
+                                               class="form-control" 
+                                               name="foo" 
+                                               ng-model="attribute.value" 
+                                               ng-required="attribute.mandatory"/>                                        
+                                    </div>
+                                </div>
+                            </ng-form>
+                            <span ng-show="outerForm.submitted && innerForm.foo.$invalid" style="color:red;font-size:12px">{{'required'| translate}}</span>
+                        </td>
+                    </tr>                        
+                </table>
+                
+                <div class="vertical-spacing col-md-12">            
+                    <button type="button" 
+                            class="btn btn-primary"
+                            ng-click="enroll()">
+                        {{'enroll'| translate}}
+                    </button>  
+                    <button type="button" 
+                            class="btn btn-default"
+                            ng-click="showNewEnrollment()">
+                        {{'cancel'| translate}}
+                    </button>                    
+                </div>
+            </div>
+        </form>    
+        <!-- new enrollment registration form ends -->
+
+        <!-- operations on historical enrollment begins -->
+        <div ng-if="showEnrollmentHistoryDiv">
+            enrollment history here...
+        </div>
+        <!-- operations on historical enrollment ends -->
+
+        <div ng-if="selectedProgram && !selectedEnrollment && !showEnrollmentDiv && !hasEnrollmentHistory">
+            <div class="alert alert-warning">{{'not_yet_enrolled_enrollment'| translate}}</div> 
+        </div>
+        <div ng-if="selectedProgram && !selectedEnrollment && !showEnrollmentDiv && hasEnrollmentHistory">
+            <div class="alert alert-warning">{{'not_active_enrollment_exists'| translate}}</div> 
+        </div>
+        <div ng-if="!selectedProgram && programExists">
+            <div class="alert alert-danger">{{'please_select_a_program_for_enrollment'| translate}}</div> 
+        </div>
+        <div ng-if="!programExists">
+            <div class="alert alert-danger">{{'no_program_exists_enrollment'| translate}}</div> 
+        </div>
+
+    </div>
+</div>

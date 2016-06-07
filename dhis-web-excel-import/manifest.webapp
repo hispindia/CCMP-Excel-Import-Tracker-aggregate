@@ -1,0 +1,13 @@
+{
+	"version":"1.0"
+	,"name":"Excel Data Import"
+	,"description":"Excel Data Import"
+	,"icons":{"16":null,"48":"img/icons/index.jpeg","128":null}
+	,"developer":{"url":"","name":"Mithilesh","company":null,"email":null}
+	,"launch_path":"index.html"
+	,"installs_allowed_from":null
+	,"default_locale":"en"
+	,"activities": {
+	  "dhis": { "href": "*" }
+	}
+}

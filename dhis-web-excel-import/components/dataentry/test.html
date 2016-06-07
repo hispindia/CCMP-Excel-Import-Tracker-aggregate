@@ -1,0 +1,297 @@
+<script type="text/JavaScript">
+
+   /* $(document).ready(function(){
+
+            var patientCardValue = $( 'VeEvLxkOmxn-yMldo3d7Rr8-val' ).val;
+
+            if(  patientCardValue.toLowerCase() == "true")
+            {
+                $( 'VeEvLxkOmxn-a3Y0SjaBmTM-val' ).attr('checked', true);
+            }
+            else
+            {
+                $( 'VeEvLxkOmxn-a3Y0SjaBmTM-val' ).attr('checked', false);
+            }
+    });*/
+
+    function check(){
+        var patientCardValue = document.getElementById( "VeEvLxkOmxn-yMldo3d7Rr8-val" ).value;
+        if(patientCardValue){
+            document.getElementById( "VeEvLxkOmxn-a3Y0SjaBmTM-val" ).checked = true;
+        }else{
+            document.getElementById( "VeEvLxkOmxn-a3Y0SjaBmTM-val" ).checked = false;
+        }
+    }
+
+
+    function validatePatientCard()
+    {
+        var patientCardValue = document.getElementById( "VeEvLxkOmxn-yMldo3d7Rr8-val" ).value;
+
+        if(  patientCardValue == "Yes" || patientCardValue == "yes" )
+        {
+            document.getElementById( "VeEvLxkOmxn-a3Y0SjaBmTM-val" ).disabled = false;
+        }
+        else
+        {
+            document.getElementById( "VeEvLxkOmxn-a3Y0SjaBmTM-val" ).value = "";
+            document.getElementById( "VeEvLxkOmxn-a3Y0SjaBmTM-val" ).disabled = true;
+        }
+    }
+
+    function validatePatientCard()
+    {
+        var patientCardValue = document.getElementById( "VeEvLxkOmxn-yMldo3d7Rr8-val" ).value;
+
+        if(  patientCardValue == "Yes" || patientCardValue == "yes" )
+        {
+            document.getElementById( "VeEvLxkOmxn-a3Y0SjaBmTM-val" ).disabled = false;
+        }
+        else
+        {
+            document.getElementById( "VeEvLxkOmxn-a3Y0SjaBmTM-val" ).value = "";
+            document.getElementById( "VeEvLxkOmxn-a3Y0SjaBmTM-val" ).disabled = true;
+        }
+    }
+
+    function validateTypeOfTest()
+    {
+        var typeOfTestValue = document.getElementById( "VeEvLxkOmxn-t7tZhVc2X2X-val" ).value;
+
+        //alert( typeOfTestValue );
+
+        if(  typeOfTestValue == "RDT" || typeOfTestValue == "rdt" )
+        {
+            document.getElementById( "VeEvLxkOmxn-ETDBSktlBoS-val" ).disabled = false;
+
+            document.getElementById( "VeEvLxkOmxn-U5pngqPqnF4-val" ).value = "";
+            document.getElementById( "VeEvLxkOmxn-U5pngqPqnF4-val" ).disabled = true;
+        }
+        else if( typeOfTestValue == "BSE" || typeOfTestValue == "bse" )
+        {
+            document.getElementById( "VeEvLxkOmxn-U5pngqPqnF4-val" ).disabled = false;
+
+            document.getElementById( "VeEvLxkOmxn-ETDBSktlBoS-val" ).value = "";
+            document.getElementById( "VeEvLxkOmxn-ETDBSktlBoS-val" ).disabled = true;
+        }
+        else if( typeOfTestValue == "Both" || typeOfTestValue == "both" )
+        {
+            document.getElementById( "VeEvLxkOmxn-ETDBSktlBoS-val" ).disabled = false;
+            document.getElementById( "VeEvLxkOmxn-U5pngqPqnF4-val" ).disabled = false;
+        }
+    }
+
+    function validateFollowUp()
+    {
+        var followValue = document.getElementById( "VeEvLxkOmxn-cxhm4UZNKlv-val" ).value;
+        //alert( followValue );
+        if(  followValue == "No" || followValue == "no" )
+        {
+            document.getElementById( "VeEvLxkOmxn-w0mBH9b21FH-val" ).value = "";
+            document.getElementById( "VeEvLxkOmxn-w0mBH9b21FH-val" ).disabled = true;
+
+            document.getElementById( "VeEvLxkOmxn-cjh1bn0X9xS-val" ).value = "";
+            document.getElementById( "VeEvLxkOmxn-cjh1bn0X9xS-val" ).disabled = true;
+        }
+        else
+        {
+            document.getElementById( "VeEvLxkOmxn-w0mBH9b21FH-val" ).disabled = false;
+            document.getElementById( "VeEvLxkOmxn-cjh1bn0X9xS-val" ).disabled = false;
+        }
+    }
+
+    function validateAdverseEvents()
+    {
+        var adverseEventsValue = document.getElementById( "VeEvLxkOmxn-thpr4q6NG0i-val" ).value;
+
+        if(  adverseEventsValue == "Yes" || adverseEventsValue == "yes" )
+        {
+            document.getElementById( "VeEvLxkOmxn-zBHCJ5cPIih-val" ).disabled = false;
+            document.getElementById( "VeEvLxkOmxn-deQqszawD4n-val" ).disabled = false;
+            document.getElementById( "VeEvLxkOmxn-p8gjQS4OHZo-val" ).disabled = false;
+            document.getElementById( "VeEvLxkOmxn-Fzq7eWuyxNN-val" ).disabled = false;
+            document.getElementById( "VeEvLxkOmxn-d4LOYK83RFa-val" ).disabled = false;
+            document.getElementById( "VeEvLxkOmxn-WCJVNt1Mgo8-val" ).disabled = false;
+        }
+        else
+        {
+            document.getElementById( "VeEvLxkOmxn-zBHCJ5cPIih-val" ).value = "";
+            document.getElementById( "VeEvLxkOmxn-zBHCJ5cPIih-val" ).disabled = true;
+
+            document.getElementById( "VeEvLxkOmxn-deQqszawD4n-val" ).value = "";
+            document.getElementById( "VeEvLxkOmxn-deQqszawD4n-val" ).disabled = true;
+
+            document.getElementById( "VeEvLxkOmxn-p8gjQS4OHZo-val" ).value = "";
+            document.getElementById( "VeEvLxkOmxn-p8gjQS4OHZo-val" ).disabled = true;
+
+            document.getElementById( "VeEvLxkOmxn-Fzq7eWuyxNN-val" ).value = "";
+            document.getElementById( "VeEvLxkOmxn-Fzq7eWuyxNN-val" ).disabled = true;
+
+            document.getElementById( "VeEvLxkOmxn-Fzq7eWuyxNN-val" ).value = "";
+            document.getElementById( "VeEvLxkOmxn-Fzq7eWuyxNN-val" ).disabled = true;
+
+            document.getElementById( "VeEvLxkOmxn-d4LOYK83RFa-val" ).value = "";
+            document.getElementById( "VeEvLxkOmxn-d4LOYK83RFa-val" ).disabled = true;
+
+            document.getElementById( "VeEvLxkOmxn-WCJVNt1Mgo8-val" ).value = "";
+            document.getElementById( "VeEvLxkOmxn-WCJVNt1Mgo8-val" ).disabled = true;
+        }
+    }
+
+    function validatePatientReferred()
+    {
+        var patientReferredValue = document.getElementById( "VeEvLxkOmxn-qUtNLEictcw-val" ).value;
+
+        if(  patientReferredValue == "" || patientReferredValue == " " )
+        {
+            document.getElementById( "VeEvLxkOmxn-XHwlBzRz2KZ-val" ).value = "";
+            document.getElementById( "VeEvLxkOmxn-XHwlBzRz2KZ-val" ).disabled = true;
+        }
+        else
+        {
+            document.getElementById( "VeEvLxkOmxn-XHwlBzRz2KZ-val" ).disabled = false;
+        }
+    }
+
+    function validateDeathReported()
+    {
+        var deathReportedValue = document.getElementById( "VeEvLxkOmxn-P5Z8y0snXIR-val" ).value;
+
+        if(  deathReportedValue == "Yes" || deathReportedValue == "yes" )
+        {
+            document.getElementById( "VeEvLxkOmxn-jvYxMv6fxHt-val" ).disabled = false;
+        }
+        else
+        {
+            document.getElementById( "VeEvLxkOmxn-jvYxMv6fxHt-val" ).value = "";
+            document.getElementById( "VeEvLxkOmxn-jvYxMv6fxHt-val" ).disabled = true;
+        }
+
+    }
+
+</script><SCRIPT TYPE="text/JavaScript">
+    window.onload = validateTypeOfTest();
+    window.onload = validateFollowUp();
+    window.onload = validateAdverseEvents();
+    window.onload = check();
+</script>
+
+<table border="1" cellpadding="0" cellspacing="0" height="602" width="800">
+    <colgroup>
+        <col />
+        <col />
+        <col />
+        <col />
+        <col />
+        <col />
+    </colgroup>
+    <tbody>
+    <tr height="29">
+        <td colspan="6" style="height: 60px; width: 608px; text-align: center; background-color: rgb(102, 204, 204);"><strong>M1 form for Malaria Positive cases</strong></td>
+    </tr>
+    <tr>
+        <td colspan="2" height="29" style="height:29px;">Provider type (For cases reported at SC)</td>
+        <td style="text-align: center;"><input id="VeEvLxkOmxn-KIakqzU1H7y-val" name="entryfield" size="10" title="[ KIakqzU1H7y - Provider type (only if reported at Subcentre) - string ]" type="" value="[Provider type (only if reported at Subcentre)]" /></td>
+        <td colspan="2">Is patient card issued?</td>
+        <td style="text-align: center;"><input id="VeEvLxkOmxn-yMldo3d7Rr8-val" name="entryfield" size="10" title="[ yMldo3d7Rr8 - Was patient card issued? - trueOnly ]" type="" value="[Was patient card issued?]"/></td>
+    </tr>
+    <tr height="29">
+        <td colspan="2" height="29" style="height:29px;"><span style="line-height: 20.7999992370605px;">Is the patient pregnant?</span></td>
+        <td style="text-align: center;"><input id="VeEvLxkOmxn-MH5d0AUN1Dp-val" name="entryfield" size="10" title="[ MH5d0AUN1Dp - Is the patient pregnant? - string ]" type="" value="[Is the patient pregnant?]" /></td>
+        <td colspan="2"><span style="line-height: 20.7999992370605px;">Duration of fever (days)</span></td>
+        <td style="text-align: center;"><input id="VeEvLxkOmxn-zBhCiBQOXTv-val" name="entryfield" size="10" title="[ zBhCiBQOXTv - Duration of fever (days) - number ]" type="" value="[Duration of fever (days)]" /></td>
+    </tr>
+    <tr height="29">
+        <td colspan="2" height="29" style="height:29px;"><span style="line-height: 20.7999992370605px;">Tested at</span></td>
+        <td style="text-align: center;"><input id="VeEvLxkOmxn-GmKTolgNYmp-val" name="entryfield" size="10" title="[ GmKTolgNYmp - Tested at - string ]" type="" value="[Tested at]" /></td>
+        <td colspan="2"><span style="line-height: 20.7999992370605px;">Type of detection</span></td>
+        <td style="text-align: center;"><input id="VeEvLxkOmxn-VdE4DP1DWTn-val" name="entryfield" size="10" title="[ VdE4DP1DWTn - Type of detection - string ]" type="" value="[Type of detection]" /></td>
+    </tr>
+    <tr height="29">
+        <td colspan="2" height="29" style="height:29px;">Type of Test</td>
+        <td style="text-align: center;"><input id="VeEvLxkOmxn-t7tZhVc2X2X-val" name="entryfield" onblur="validateTypeOfTest();" size="10" title="[ t7tZhVc2X2X - Type of malaria test done - string ]" type="" value="[Type of malaria test done]" /></td>
+        <td colspan="2">Date of test</td>
+        <td style="text-align: center;"><input id="VeEvLxkOmxn-xsSwpSEdsgA-val" name="entryfield" size="10" title="[ xsSwpSEdsgA - Date of test - date ]" type="" value="[Date of test]" /></td>
+    </tr>
+    <tr height="29">
+        <td colspan="2" height="29" style="height:29px;">RDT results</td>
+        <td style="text-align: center;"><input id="VeEvLxkOmxn-ETDBSktlBoS-val" name="entryfield" size="10" title="[ ETDBSktlBoS - RDT results - string ]" type="" value="[RDT results]" /></td>
+        <td colspan="2">Blood slide results</td>
+        <td style="text-align: center;"><input id="VeEvLxkOmxn-U5pngqPqnF4-val" name="entryfield" size="10" title="[ U5pngqPqnF4 - Blood smear results - string ]" type="" value="[Blood smear results]" /></td>
+    </tr>
+    <tr height="29">
+        <td colspan="2" height="29" style="height:29px;">Pf gametocyte present?</td>
+        <td style="text-align: center;"><input id="VeEvLxkOmxn-A61MNUiRgvq-val" name="entryselect" size="10" title="[ A61MNUiRgvq - Pf Gametocyte present? - string ]" type="text" value="[Pf Gametocyte present?]" /></td>
+        <td colspan="2">Date of initiating treatment</td>
+        <td style="text-align: center;"><input id="VeEvLxkOmxn-jXvpoNUjApp-val" name="entryfield" size="10" title="[ jXvpoNUjApp - Date of treatment - date ]" type="" value="[Date of treatment]" /></td>
+    </tr>
+    <tr height="29">
+        <td colspan="2" height="29" style="height:29px;">Type of treatment given</td>
+        <td style="text-align: center;"><input id="VeEvLxkOmxn-M5x0KbKFFMk-val" name="entryfield" size="10" title="[ M5x0KbKFFMk - Type of treatment given - string ]" type="" value="[Type of treatment given]" /></td>
+        <td colspan="2"><span style="line-height: 20.7999992370605px;">Date of completion of treatment</span></td>
+        <td style="text-align: center;"><input id="VeEvLxkOmxn-kOxjrl1LhmP-val" name="entryfield" size="10" title="[ kOxjrl1LhmP - Date of completion of treatment - date ]" type="" value="[Date of completion of treatment]" /></td>
+    </tr>
+    <tr height="29">
+        <td colspan="2" height="29" style="height:29px;"><span style="line-height: 20.7999992370605px; text-align: center;">PQ doses given</span></td>
+        <td style="text-align: center;"><input id="VeEvLxkOmxn-V5sVeEc3DhN-val" name="entryfield" size="10" title="[ V5sVeEc3DhN - PQ doses given - string ]" type="" value="[PQ doses given]" /></td>
+        <td colspan="2"><span style="line-height: 20.7999992370605px;">Days PQ taken</span></td>
+        <td style="text-align: center;"><input id="VeEvLxkOmxn-U0PjOmtZtmm-val" name="entryfield" size="10" title="[ U0PjOmtZtmm - Days PQ taken - number ]" type="" value="[Days PQ taken]" /></td>
+    </tr>
+    <tr height="29">
+        <td colspan="2" height="29" style="height:29px;"><span style="line-height: 20.7999992370605px;">Follow-up done</span></td>
+        <td style="text-align: center;"><input id="VeEvLxkOmxn-cxhm4UZNKlv-val" name="entryfield" onblur="validateFollowUp();" size="10" title="[ cxhm4UZNKlv - Follow up done - string ]" type="text" value="[Follow up done]" /></td>
+        <td colspan="2">Place where follow-up done</td>
+        <td style="text-align: center;"><input id="VeEvLxkOmxn-w0mBH9b21FH-val" name="entryfield" size="10" title="[ w0mBH9b21FH - Place where follow-up done - string ]" type="" value="[Place where follow-up done]" /></td>
+    </tr>
+    <tr>
+        <td colspan="2" height="29" style="height:29px;">Procedure done during follow-up</td>
+        <td style="text-align: center;"><input id="VeEvLxkOmxn-cjh1bn0X9xS-val" name="entryfield" size="10" title="[ cjh1bn0X9xS - Procedure done during follow-up - string ]" type="" value="[Procedure done during follow-up]" /></td>
+        <td colspan="2"><span style="line-height: 20.7999992370605px;">Date of issuing patient card</span></td>
+        <td style="text-align: center;"><input id="VeEvLxkOmxn-a3Y0SjaBmTM-val" name="entryfield" size="10" title="[ a3Y0SjaBmTM - Date of issuing patient card - date ]" type="" value="[Date of issuing patient card]" /></td>
+    </tr>
+    <tr height="29">
+        <td colspan="3" height="29" rowspan="1" style="height: 29px; background-color: rgb(102, 153, 255);">Any adverse events reported?</td>
+        <td colspan="3" style="text-align: center; background-color: rgb(102, 153, 255);"><input id="VeEvLxkOmxn-thpr4q6NG0i-val" name="entryfield" onblur="validateAdverseEvents();" size="10" title="[ thpr4q6NG0i - Adverse events reported - string ]" type="" value="[Adverse events reported]" /></td>
+    </tr>
+    <tr height="29">
+        <td colspan="2" height="29" style="height:29px;">Tiredness</td>
+        <td style="text-align: center;"><input id="VeEvLxkOmxn-zBHCJ5cPIih-val" name="entryfield" size="10" title="[ zBHCJ5cPIih - Adverse events- Tiredness - string ]" type="" value="[Adverse events- Tiredness]" /></td>
+        <td colspan="2">Dizziness</td>
+        <td style="text-align: center;"><input id="VeEvLxkOmxn-deQqszawD4n-val" name="entryfield" size="10" title="[ deQqszawD4n - Adverse events- Dizziness - string ]" type="" value="[Adverse events- Dizziness]" /></td>
+    </tr>
+    <tr height="29">
+        <td colspan="2" height="29" style="height:29px;">Dark urine</td>
+        <td style="text-align: center;"><input id="VeEvLxkOmxn-p8gjQS4OHZo-val" name="entryfield" size="10" title="[ p8gjQS4OHZo - Adverse events- Dark urine - string ]" type="" value="[Adverse events- Dark urine]" /></td>
+        <td colspan="2">Pale skin</td>
+        <td style="text-align: center;"><input id="VeEvLxkOmxn-Fzq7eWuyxNN-val" name="entryfield" size="10" title="[ Fzq7eWuyxNN - Adverse events- Pale skin - string ]" type="" value="[Adverse events- Pale skin]" /></td>
+    </tr>
+    <tr height="29">
+        <td colspan="2" height="29" style="height:29px;">Breathlessness</td>
+        <td style="text-align: center;"><input id="VeEvLxkOmxn-d4LOYK83RFa-val" name="entryfield" size="10" title="[ d4LOYK83RFa - Adverse events- Breathlessness - string ]" type="" value="[Adverse events- Breathlessness]" /></td>
+        <td colspan="2">Others</td>
+        <td style="text-align: center;"><input id="VeEvLxkOmxn-WCJVNt1Mgo8-val" name="entryfield" size="10" title="[ WCJVNt1Mgo8 - Adverse events- Others - string ]" type="" value="[Adverse events- Others]" /></td>
+    </tr>
+    <tr height="41">
+        <td colspan="2" height="41" style="height:41px;">Is the patient admitted?</td>
+        <td style="text-align: center;"><input id="VeEvLxkOmxn-HuI7MOlMJrS-val" name="entryselect" size="10" title="[ HuI7MOlMJrS - Is the patient admitted? - string ]" type="" value="[Is the patient admitted?]" /></td>
+        <td colspan="2"><span style="line-height: 20.7999992370605px;">Is patient suspected of severe malaria?</span></td>
+        <td style="text-align: center;"><input id="VeEvLxkOmxn-u8cLQLVvcup-val" name="entryfield" size="10" title="[ u8cLQLVvcup - Is the patient suspected of severe malaria? - string ]" type="" value="[Is the patient suspected of severe malaria?]" /></td>
+    </tr>
+    <tr height="48">
+        <td colspan="2" height="48" style="height:48px;width:211px;">Where was the patient referred?</td>
+        <td style="text-align: center;"><input id="VeEvLxkOmxn-qUtNLEictcw-val" name="entryfield" onblur="validatePatientReferred();" size="10" title="[ qUtNLEictcw - Place where malaria case was referred - string ]" type="" value="[Place where malaria case was referred]" /></td>
+        <td colspan="2" style="width:180px;"><span style="line-height: 20.7999992370605px;">Date of referral if referred</span></td>
+        <td style="text-align: center;"><input id="VeEvLxkOmxn-XHwlBzRz2KZ-val" name="entryfield" size="10" title="[ XHwlBzRz2KZ - Date of referral - date ]" type="" value="[Date of referral]" /></td>
+    </tr>
+    <tr>
+        <td colspan="2" height="48" style="height:48px;width:211px;">Death reported? (Add in notes if the patient death ocurred in another Block or District)</td>
+        <td style="text-align: center;"><input id="VeEvLxkOmxn-P5Z8y0snXIR-val" name="entryfield" onblur="validateDeathReported();" size="10" title="[ P5Z8y0snXIR - Death reported - string ]" type="" value="[Death reported]" /></td>
+        <td colspan="2" style="width:180px;"><span style="line-height: 20.7999992370605px;">Date of death</span></td>
+        <td style="text-align: center;"><input id="VeEvLxkOmxn-jvYxMv6fxHt-val" name="entryfield" size="10" title="[ jvYxMv6fxHt - Date of death - date ]" type="" value="[Date of death]" /></td>
+    </tr>
+    <tr>
+        <td colspan="2" height="48" style="height:48px;width:211px;">Remarks / Notes</td>
+        <td colspan="4" rowspan="1" style="text-align: center;"><input id="VeEvLxkOmxn-qt7K89MN01g-val" name="entryfield" title="[ qt7K89MN01g - Remarks / Notes - string ]" value="[Remarks / Notes]" /></td>
+    </tr>
+    </tbody>
+</table>
